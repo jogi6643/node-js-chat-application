@@ -160,4 +160,5 @@ socket.on('chatMessageDeleted', function (id) {
     $('#' + id).remove();
 })
 
+
 // Update User chat Functionality
