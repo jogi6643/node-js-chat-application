@@ -1,0 +1,42 @@
+         #chat-container {
+            background-color: lightblue;
+            width: 100%;
+            height: 400px;
+            overflow: scroll;
+        }
+
+        .user-list {
+            cursor: pointer;
+            width: 400px;
+        }
+
+        .chat-section {
+            display: none;
+        }
+
+        .online-status {
+            color: green;
+        }
+
+        .offline-status {
+            color: red;
+        }
+
+        .current-user-chat {
+            text-align: right;
+            color: black;
+            margin: 10px;
+        }
+
+        .other-user-chat {
+            text-align: left;
+            color: white;
+            margin: 10px;
+        }
+
+        .fa-trash {
+            color: red;
+        }
+        .fa-edit {
+            color: blue;
+        }
