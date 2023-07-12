@@ -43,6 +43,7 @@ const login = async (req, res) => {
             const passwordMatch = await bcrypt.compare(password, userData.password);
             if (passwordMatch) {
                 req.session.user = userData;
+                res.cookie(`user`,JSON.stringify(userData));
                 res.redirect('/dashboard');
             } else {
                 res.render('login', {
@@ -134,6 +135,7 @@ const updatechat = async (req, res) => {
 }
 const logout = async (req, res) => {
     try {
+        res.clearCookies('user');
         req.session.destroy();
         res.redirect('/login');
 

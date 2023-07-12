@@ -1,8 +1,19 @@
-var sender_id = `<%= user._id %>`;
+function getCookie(name) {
+	let matches = document.cookie.match(new RegExp(
+		"(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+	));
+	return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+var userData = JSON.parse(getCookie('user'));
+console.log('userData',userData._id);
+
+// var sender_id = `<%= user._id %>`;
+var sender_id = userData._id;
 var receiver_id;
 let socket = io('/user-namespace', {
     auth: {
-        token: `<%= user._id %>`
+        // token: `<%= user._id %>`
+        token: userData._id
     }
 });
 
@@ -75,12 +86,11 @@ $('#chat-form').submit(function (event) {
 
 // Load other user chats from broadcast
 socket.on('loadNewChat', function (data) {
-    console.log(sender_id + '==' + data.receiver_id, 'ok');
     if (sender_id == data.receiver_id && receiver_id == data.sender_id) {
         let chat = data.message;
         let html = ` <div class="other-user-chat" id='${data._id}'>
-                             <h5>${chat}
-                                </h5>
+                             <h5><span>${chat}
+                                </span></h5>
                             </div>`;
         $('#chat-container').append(html);
         scrollChat();
@@ -160,5 +170,43 @@ socket.on('chatMessageDeleted', function (id) {
     $('#' + id).remove();
 })
 
-
 // Update User chat Functionality
+$(document).on('click','.fa-edit',function () {
+    $('#edit-message-id').val($(this).attr('data-id'))
+    $('#update-message').val($(this).attr('data-msg'))
+
+})
+
+
+// update msg using ajax
+
+$('#edit-chat-form').submit(function (e) {
+    e.preventDefault();
+    let id = $('#edit-message-id').val();
+    let msg = $('#update-message').val();
+    $.ajax({
+        url: 'update-chat',
+        type: 'POST',
+        data: {
+            id: id,
+            message:msg
+        },
+        success: function (response) {
+            if (response.success) {
+                $('#editChatModal').model('hide');
+                $('#'+id).find('span').text(msg);
+                $('#'+id).find('.fa-edit').attr('data-msg',msg);
+                socket.emit('chatUpdated', {id:id,message:msg});
+
+            } else {
+                alert(response.message)
+            }
+
+        }
+    })
+
+});
+
+socket.on('chatMessageUpdated', function (data) {
+    $('#'+data.id).find('span').text(data.message);
+})

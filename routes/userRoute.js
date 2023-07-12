@@ -3,6 +3,7 @@ const path = require('path');
 const multer = require('multer');
 const user_route = express();
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const dotenv = require('dotenv').config() 
 
@@ -12,6 +13,7 @@ user_route.use(session({
     saveUninitialized: true
 }))
 
+user_route.use(cookieParser());
 user_route.use(bodyParser.json());
 user_route.use(bodyParser.urlencoded({
     extended: true
