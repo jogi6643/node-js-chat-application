@@ -7,28 +7,8 @@
     <title>Dshboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
-     
-    <style>
-        #chat-container {
-            background-color: lightblue;
-            width: 100%;
-            height: 400px;
-            overflow: scroll;
-        }
-        .user-list{
-            cursor: pointer;
-        }
-
-        .chat-section {
-            display: none;
-        }
-        .online-status{
-            color:green;
-        }
-        .offline-status{
-            color:red;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
@@ -62,99 +42,144 @@
                 </div>
             </div>
         </nav>
+    </div>
 
-        <div class="container">
-            <div class="row">
-                <%
-            if(users.length>0){
-                for(var i=0;i<users.length;i++){
-                    %>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <ul class="list-group">
+                    <% if(users.length>0){
+                        for(var i=0;i<users.length;i++){ %>
+                    <li class="list-group-item list-group-item-dark cursor-pointer user-list"
+                        data-id="<%= users[i]._id %>">
+                        <img src="<%= users[i].image%>" width="50px" height="50px" alt="...">
 
-                <div class="card user-list" style="width: 18rem;">
-                    <img src="<%= users[i].image%>" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <p class="card-text"><%= users[i].name%></p>
-                        <% 
-                        if(users[i].is_online==='1'){
-                            %>
-                            <sup class="online-status" id='<%= users[i]._id %>-status'>Online</sup>
-                            <%
+                        <%= users[i].name%>
+                        <% if(users[i].is_online==='1' ){ %>
+                        <sup class="online-status" id='<%= users[i]._id %>-status'>Online</sup>
+                        <% }else{ %>
+                        <sup class="offline-status" id='<%= users[i]._id %>-status'>Offline</sup>
+                        <% } %>
+                    </li>
 
-                        }else{
-                            %>
-                            <sup class="offline-status" id='<%= users[i]._id %>-status'>Offline</sup>
-                            <%
-                        }
-                        %>
-                    </div>
-                </div>
-
-                <%
-                }
-            }
-         
-            %>
+                    <% } } %>
+                </ul>
             </div>
-
-
-        </div>
-
-        <!-- <div class="container"> -->
-            <h3 class="card chat-heading">Click to start Chat</h3>
-            <div class="chat-section">
-                <div id="chat-container">
+            <div class="col-md-8">
+                <h3 class="card chat-heading">Click to start Chat</h3>
+                <div class="chat-section">
+                    <div id="chat-container">
+                    </div>
                     <form action="#" id="chat-form">
                         <input type="text" name="message" class="form-control" id="message"
                             placeholder="Please Enten Message" required>
                         <input type="submit" value="Send Message" class="btn btn-primary">
                     </form>
+
                 </div>
             </div>
-        <!-- </div> -->
-
+        </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.js" integrity="sha512-VJ6+sp2E5rFQk05caiXXzQd1wBABpjEj1r5kMiLmGAAgwPItw1YpqsCCBtq8Yr1x6C49/mTpRdXtq8O2RcZhlQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.2/socket.io.esm.min.js" integrity="sha512-DTofBfoeXMK3Q4k7vP48PHuzMuASsQ7kWlNck5KdQTKBJ012/lHThxpzyQQks7Vts1ELo50BoCdFOTtEX+x+Yg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous">
-    </script>
+
+
+    <!-- Delete-Modal -->
+    <div class="modal fade" id="deleteChatModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Delete Chat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="delete-chat-form">
+                    <div class="modal-body">
+                        <input type="hidden" class="form-control" name="id" id="delete-message-id">
+                        <p>Are you sure you want to delete this chat?</p>
+                        <p><b id="delele-message"></b></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="editChatModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">edit Chat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="edit-chat-form">
+                    <div class="modal-body">
+                        <input type="hidden" class="form-control" name="id" id="edit-message-id">
+                        <input type="text" class="form-control" id="update-message" required
+                            placeholder="Enter Message" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit-Model-->
+    <div class="modal fade" id="editChatModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">edit Chat</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="edit-chat-form">
+                    <div class="modal-body">
+                        <input type="hidden" class="form-control" name="id" id="edit-message-id">
+                        <input type="text" class="form-control" id="update-message" required
+                            placeholder="Enter Message" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
     <script src="https://code.jquery.com/jquery-3.7.0.js"
         integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
-    <script>
 
-        let sender_id = `<%= user._id %>`;
-        let socket = io('/user-namespace',{
-            auth:{
-                token: `<%= user._id %>`
-            }
-        });
-        console.log(socket)
-        $(document).ready(function () {
-            $(".user-list").click(function () {
-                var myClass = $(this).attr("class");
-                $(".chat-heading").hide();
-                $(".chat-section").show();
-                $(".chat-container").show();
-            
-            });
-        })
 
-        // Update user online status
-        socket.on('getOnlineUser',function(data){
-            $('#'+data.user_id+'-status').text('Online');
-            $('#'+data.user_id+'-status').removeClass('offline-status');
-            $('#'+data.user_id+'-status').addClass('online-status');
-        })
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.2/socket.io.js"
+    integrity="sha512-VJ6+sp2E5rFQk05caiXXzQd1wBABpjEj1r5kMiLmGAAgwPItw1YpqsCCBtq8Yr1x6C49/mTpRdXtq8O2RcZhlQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.2/socket.io.esm.min.js"
+    integrity="sha512-DTofBfoeXMK3Q4k7vP48PHuzMuASsQ7kWlNck5KdQTKBJ012/lHThxpzyQQks7Vts1ELo50BoCdFOTtEX+x+Yg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-         // Update user offline status
-         socket.on('getOfflineUser',function(data){
-            $('#'+data.user_id+'-status').text('Offline');
-            $('#'+data.user_id+'-status').addClass('offline-status');
-            $('#'+data.user_id+'-status').removeClass('online-status');
-            
-            
-        })
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous">
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+    </script>
+    <!-- <script src="/public/assets/js/dashboard.js"></script> -->
+    <!-- <link rel="stylesheet" href="../assets/js/dashboard.js"> -->
+    <script src="../assets/js/dashboard.js"></script>
+
 </body>
 
 </html>

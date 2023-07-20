@@ -1,5 +1,6 @@
 const User = require('../models/userModel')
 const Chat = require('../models/chatModel');
+const Group = require('../models/groupModel');
 const bcrypt = require('bcrypt')
 const registerLoad = async (req, res) => {
     try {
@@ -43,7 +44,7 @@ const login = async (req, res) => {
             const passwordMatch = await bcrypt.compare(password, userData.password);
             if (passwordMatch) {
                 req.session.user = userData;
-                res.cookie(`user`,JSON.stringify(userData));
+                res.cookie(`user`, JSON.stringify(userData));
                 res.redirect('/dashboard');
             } else {
                 res.render('login', {
@@ -143,6 +144,38 @@ const logout = async (req, res) => {
         console.log(error.message);
     }
 }
+
+// Group Chats 
+const groups = async (req, res) => {
+    try {
+        const groups = await Group.find({creator_id:req.session.user._id})
+        console.log(groups);
+        res.render('groups',{groups:groups})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+// Group Chats 
+const createGroup = async (req, res) => {
+    try {
+
+        const group = new Group({
+            creator_id:req.session.user._id,
+            name:req.body.name,
+            image:'images/'+req.file.filename,
+            limit:req.body.limit,
+        })
+       
+        await group.save();
+        const groups = await Group.find({creator_id:req.session.user._id})
+        res.render('groups', {
+            groups:groups,
+            message: "Group Created Successfully"
+        })
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 module.exports = {
     registerLoad,
     register,
@@ -152,5 +185,7 @@ module.exports = {
     savechat,
     deletechat,
     updatechat,
-    logout
+    logout,
+    groups,
+    createGroup
 }
