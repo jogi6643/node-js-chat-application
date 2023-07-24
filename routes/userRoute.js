@@ -45,6 +45,7 @@ const {
     logout,
     groups,
     createGroup,
+    getMembers
 } = require('../controllers/userController')
 const {isLoggedIn,isLoggedOut} = require('../middleware/auth')
 
@@ -63,6 +64,7 @@ user_route.get('/logout',isLoggedIn, logout);
 // Start Group Chats 18-07-2023
 user_route.get('/groups',isLoggedIn, groups);
 user_route.post('/groups',upload.single('image'), createGroup);
+user_route.post('/get-members',isLoggedIn, getMembers);
 
 // user_route.get('*',(req,res)=>{
 //     res.redirect('/login')

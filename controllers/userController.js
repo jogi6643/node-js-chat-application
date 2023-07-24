@@ -176,6 +176,16 @@ const createGroup = async (req, res) => {
         console.log(error.message);
     }
 }
+
+const getMembers = async (req, res) => {
+    try{
+
+        let users = await User.find({_id:{$nin:req.session.user._id}});
+        res.status(200).send({success:true,data:users});
+    }catch(error){
+        console.log(error.message);
+    }
+}
 module.exports = {
     registerLoad,
     register,
@@ -187,5 +197,6 @@ module.exports = {
     updatechat,
     logout,
     groups,
-    createGroup
+    createGroup,
+    getMembers
 }

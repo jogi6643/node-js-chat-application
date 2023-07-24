@@ -209,4 +209,39 @@ $('#edit-chat-form').submit(function (e) {
 
 socket.on('chatMessageUpdated', function (data) {
     $('#'+data.id).find('span').text(data.message);
+
+})
+
+
+// Add Members 
+
+$('.addMember').click(function (e) {
+    console.log($(this).attr('data-id'),'Hii');
+   let group_id = $(this).attr('data-id');
+   let limit = $(this).attr('data-limit');
+   $('#group_id').val(group_id);
+   $('#limit').val(limit);
+    $.ajax({
+        url:'/get-members',
+        type:'POST',
+        data:{group_id:group_id},
+        success: function (res) {
+            if(res.success===true) {
+             let users = res.data;
+             console.log(users,'Hii');
+             let html = '';
+             for(let i=0; i<users.length; i++) {
+                html += `<tr>
+                          <td><input type="checkbox" name="members[]" value="${users[i]._id}"></td>
+                          <td>${users[i].name}</td>
+                        </tr>`;
+
+             }
+             $('.addMemberTable').html(html);
+            }else{
+                alert('Something went wrong');
+            }
+
+        }
+    })
 })

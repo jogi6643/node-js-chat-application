@@ -49,3 +49,12 @@
              width: 50px;
              border-radius: 50%;
          }
+         .cursor-pointer{
+            cursor: pointer;
+          }
+
+          .addMemberTable{
+            overflow-y: scroll;
+            height: 100px;
+            width: 100%;
+          }

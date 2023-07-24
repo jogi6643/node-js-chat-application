@@ -8,8 +8,8 @@
     <%
     if(typeof message !== "undefined"){
         %>
-        <p style="color: green"><%= message %></p>
-        <%
+    <p style="color: green"><%= message %></p>
+    <%
     }
     
     %>
@@ -17,41 +17,82 @@
     <!-- Show Groups -->
     <table class="table table-dark">
         <thead>
-          <tr>
-            <th>S.No</th>
-            <th>Image</th>
-            <th>Name</th>
-            <th>Limits</th>
-            <th>Members</th>
-            <th>Action</th>
-          </tr>
+            <tr>
+                <th>S.No</th>
+                <th>Image</th>
+                <th>Name</th>
+                <th>Limits</th>
+                <th>Members</th>
+                <th>Action</th>
+            </tr>
         </thead>
         <tbody>
-        <%
+            <%
         if(groups.length > 0){
             for(var i = 0; i < groups.length; i++){
             %>
-          <tr>
-            <th><%= i+1 %></th>
-            <th><img class="GroupImage" src="http://localhost:4040/<%= groups[i].image %>" alt=""/></th>
-            <th><%= groups[i].name %></th>
-            <th><%= groups[i].limit %></th>
-            <th>Members</th>
-            <th>Action</th>
-          </tr>
-          <%
+            <tr>
+                <th><%= i+1 %></th>
+                <th><img class="GroupImage" src="http://localhost:4040/<%= groups[i].image %>" alt="" /></th>
+                <th><%= groups[i].name %></th>
+                <th><%= groups[i].limit %></th>
+                <th><a class="cursor-pointer addMember" data-id="<%= groups[i]._id %>" data-toggle="modal"  data-limit="<%= groups[i].limit %>" data-target="#memberModel">Members</a>
+                   
+                </th>
+                <th>Action</th>
+            </tr>
+            <%
         }
         }else{
             %>
-            <tr><td>No Group Found</td></tr>
+            <tr>
+                <td>No Group Found</td>
+            </tr>
             <%
         }
 
           %>
 
-        
+
         </tbody>
-      </table>
+    </table>
+
+
+    <!-- Members Modal -->
+    <div class="modal fade" id="memberModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Members</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="" id="add-member-form">
+                    <div class="modal-body">
+                        <input type="hidden" class="form-control" id = "group_id"  name="group_id" required />
+                        <input type="hidden" class="form-control" id = "limit" name="limit" required />
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>Name</th>
+                                </tr>
+                            </thead>
+                            <tbody class="addMemberTable">
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add & Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal -->
     <div class="modal fade" id="createGroupModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
@@ -66,9 +107,11 @@
                 </div>
                 <form action="" enctype="multipart/form-data" method="post">
                     <div class="modal-body">
-                        <input type="text" class="form-control" name="name" placeholder="Enter Your Group Name" required />
+                        <input type="text" class="form-control" name="name" placeholder="Enter Your Group Name"
+                            required />
                         <input type="file" class="form-control" name="image" required />
-                        <input type="number" min ="1" class="form-control" name="limit" placeholder="Enter User limit" required />
+                        <input type="number" min="1" class="form-control" name="limit" placeholder="Enter User limit"
+                            required />
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
