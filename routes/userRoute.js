@@ -45,7 +45,8 @@ const {
     logout,
     groups,
     createGroup,
-    getMembers
+    getMembers,
+    addMembers
 } = require('../controllers/userController')
 const {isLoggedIn,isLoggedOut} = require('../middleware/auth')
 
@@ -65,6 +66,7 @@ user_route.get('/logout',isLoggedIn, logout);
 user_route.get('/groups',isLoggedIn, groups);
 user_route.post('/groups',upload.single('image'), createGroup);
 user_route.post('/get-members',isLoggedIn, getMembers);
+user_route.post('/add-members',isLoggedIn, addMembers);
 
 // user_route.get('*',(req,res)=>{
 //     res.redirect('/login')

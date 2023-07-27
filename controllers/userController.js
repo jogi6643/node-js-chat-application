@@ -1,6 +1,7 @@
 const User = require('../models/userModel')
 const Chat = require('../models/chatModel');
 const Group = require('../models/groupModel');
+const Member = require('../models/memberModel');
 const bcrypt = require('bcrypt')
 const registerLoad = async (req, res) => {
     try {
@@ -186,6 +187,15 @@ const getMembers = async (req, res) => {
         console.log(error.message);
     }
 }
+const addMembers = async (req, res) => {
+    try{
+
+        let users = await User.find({_id:{$nin:req.session.user._id}});
+        res.status(200).send({success:true,data:users});
+    }catch(error){
+        console.log(error.message);
+    }
+}
 module.exports = {
     registerLoad,
     register,
@@ -198,5 +208,6 @@ module.exports = {
     logout,
     groups,
     createGroup,
-    getMembers
+    getMembers,
+    addMembers
 }
