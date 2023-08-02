@@ -2,7 +2,10 @@ const User = require('../models/userModel')
 const Chat = require('../models/chatModel');
 const Group = require('../models/groupModel');
 const Member = require('../models/memberModel');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const {
+    request
+} = require('express');
 const registerLoad = async (req, res) => {
     try {
         res.render('register')
@@ -149,9 +152,13 @@ const logout = async (req, res) => {
 // Group Chats 
 const groups = async (req, res) => {
     try {
-        const groups = await Group.find({creator_id:req.session.user._id})
+        const groups = await Group.find({
+            creator_id: req.session.user._id
+        })
         console.log(groups);
-        res.render('groups',{groups:groups})
+        res.render('groups', {
+            groups: groups
+        })
     } catch (error) {
         console.log(error.message);
     }
@@ -161,16 +168,18 @@ const createGroup = async (req, res) => {
     try {
 
         const group = new Group({
-            creator_id:req.session.user._id,
-            name:req.body.name,
-            image:'images/'+req.file.filename,
-            limit:req.body.limit,
+            creator_id: req.session.user._id,
+            name: req.body.name,
+            image: 'images/' + req.file.filename,
+            limit: req.body.limit,
         })
-       
+
         await group.save();
-        const groups = await Group.find({creator_id:req.session.user._id})
+        const groups = await Group.find({
+            creator_id: req.session.user._id
+        })
         res.render('groups', {
-            groups:groups,
+            groups: groups,
             message: "Group Created Successfully"
         })
     } catch (error) {
@@ -179,20 +188,54 @@ const createGroup = async (req, res) => {
 }
 
 const getMembers = async (req, res) => {
-    try{
+    try {
 
-        let users = await User.find({_id:{$nin:req.session.user._id}});
-        res.status(200).send({success:true,data:users});
-    }catch(error){
+        let users = await User.find({
+            _id: {
+                $nin: req.session.user._id
+            }
+        });
+        res.status(200).send({
+            success: true,
+            data: users
+        });
+    } catch (error) {
         console.log(error.message);
     }
 }
 const addMembers = async (req, res) => {
-    try{
+    try {
 
-        let users = await User.find({_id:{$nin:req.session.user._id}});
-        res.status(200).send({success:true,data:users});
-    }catch(error){
+        if (!req.body.members) {
+            res.status(200).send({
+                success: false,
+                msg: "Please select anyone Member"
+            });
+        } else if (req.body.members.length > parseInt(req.body.limit)) {
+            res.status(200).send({
+                success: false,
+                msg: `You can not select more than ${req.body.limit} Member`
+            });
+        }
+        else{
+            await Member.deleteMany({group_id:req.body.group_id})
+            var data = [];
+            let members = req.body.members
+            for (var i = 0; i < members.length; i++) {
+                data.push({
+                    group_id:req.body.group_id,
+                    user_id:members[i],
+
+                })
+            }
+            console.log(data);
+            await Member.insertMany(data)
+            res.status(200).send({
+                success: true,
+                msg: `Members Added Successfully....`
+            });
+        }
+    } catch (error) {
         console.log(error.message);
     }
 }

@@ -155,7 +155,7 @@ $('#delete-chat-form').submit(function (e) {
         success: function (response) {
             if (response.success) {
                 $('#id' + id).remove();
-                $('#deleteChatModal').model('hide');
+                $('#deleteChatModal').modal('hide');
                 socket.emit('chatDeleted', id);
 
             } else {
@@ -193,7 +193,7 @@ $('#edit-chat-form').submit(function (e) {
         },
         success: function (response) {
             if (response.success) {
-                $('#editChatModal').model('hide');
+                $('#editChatModal').modal('hide');
                 $('#'+id).find('span').text(msg);
                 $('#'+id).find('.fa-edit').attr('data-msg',msg);
                 socket.emit('chatUpdated', {id:id,message:msg});
@@ -244,4 +244,30 @@ $('.addMember').click(function (e) {
 
         }
     })
+})
+
+
+// Add Member
+$('#add-member-form').submit(function(event){
+    event.preventDefault();
+    var formData = $(this).serialize();
+    $.ajax({
+        url:'/add-members',
+        type: 'POST',
+        data:formData,
+        success: function(response){
+            if(response.success){
+             
+             $('#add-member-form')[0].reset();
+             $('#membermodal').modal('hide');
+             alert(response.msg);
+
+            }else{
+                $('#add-member-error').text(response.msg);
+                setTimeout(() => {
+                $('#add-member-error').text('');
+                }, 2000);
+            }
+        }
+    });
 })
