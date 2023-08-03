@@ -6,6 +6,8 @@ const bcrypt = require('bcrypt');
 const {
     request
 } = require('express');
+const mongoose = require('mongoose');
+
 const registerLoad = async (req, res) => {
     try {
         res.render('register')
@@ -190,11 +192,42 @@ const createGroup = async (req, res) => {
 const getMembers = async (req, res) => {
     try {
 
-        let users = await User.find({
-            _id: {
-                $nin: req.session.user._id
+        // let users = await User.find({
+        //     _id: {
+        //         $nin: req.session.user._id
+        //     }
+        // });
+        let users = await User.aggregate([
+            {
+                $lookup:{
+                    from:"members",
+                    localField:"_id",
+                    foreignField:"user_id",
+                    pipeline:[
+                        {
+                            $match:{
+                                $expr:{
+                                    $and:[
+                                        {
+                                            $eq:["$group_id",new mongoose.Types.ObjectId(req.body.group_id)]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as:"member"
+                }
+            },
+            {
+                $match:{
+                    "_id":{
+                        $nin:[new mongoose.Types.ObjectId(req.session.user._id)]
+                    }
+                }
             }
-        });
+        ]);
+        console.log(users);
         res.status(200).send({
             success: true,
             data: users
@@ -228,7 +261,6 @@ const addMembers = async (req, res) => {
 
                 })
             }
-            console.log(data);
             await Member.insertMany(data)
             res.status(200).send({
                 success: true,
@@ -238,6 +270,49 @@ const addMembers = async (req, res) => {
     } catch (error) {
         console.log(error.message);
     }
+}
+
+const updateChatGroup = async (req, res) => {
+    try {
+        if(parseInt(req.body.limit)<parseInt(req.body.last_limit)){
+            await Member.deleteMany({group_id:req.body.gid});
+        }
+        var updateObj;
+        if(req.file != undefined ){
+            updateObj ={
+                name: req.body.name,
+                image: 'images/' + req.file.filename,
+                limit: req.body.limit,
+            }
+        }else{
+            updateObj ={
+                name: req.body.name,
+                limit: req.body.limit,
+            }
+
+        }
+        await Group.findByIdAndUpdate({_id:req.body.gid},{$set:updateObj})
+
+        res.status(200).send({
+            success: true,
+            msg: `Chat group updated successfully ....`
+        });
+    } catch (error) {
+        console.log(error.message);
+    }
+
+}
+const deleteChatGroup = async(req, res) => {
+try {
+    await Group.deleteOne({_id:req.body.gid});
+    await Member.deleteMany({group_id:req.body.gid});
+    res.status(200).send({
+        success: true,
+        msg: `Chat group delete successfully ....`
+    });
+} catch (error) {
+    console.log(error.message);
+}
 }
 module.exports = {
     registerLoad,
@@ -252,5 +327,7 @@ module.exports = {
     groups,
     createGroup,
     getMembers,
-    addMembers
+    addMembers,
+    updateChatGroup,
+    deleteChatGroup
 }

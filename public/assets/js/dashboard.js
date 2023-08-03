@@ -228,11 +228,11 @@ $('.addMember').click(function (e) {
         success: function (res) {
             if(res.success===true) {
              let users = res.data;
-             console.log(users,'Hii');
              let html = '';
              for(let i=0; i<users.length; i++) {
+                let isMemberOfGroup = users[i].member.length>0?true:false;
                 html += `<tr>
-                          <td><input type="checkbox" name="members[]" value="${users[i]._id}"></td>
+                          <td><input type="checkbox" ${isMemberOfGroup?'checked':''} name="members[]" value="${users[i]._id}"></td>
                           <td>${users[i].name}</td>
                         </tr>`;
 
@@ -270,4 +270,76 @@ $('#add-member-form').submit(function(event){
             }
         }
     });
+})
+
+
+// Update Group 
+
+$('.updateGroup').click(function(){
+    var obj = JSON.parse($(this).attr('data-obj'));
+    $("#update_group_id").val(obj._id);
+    $("#last_limit").val(obj.limit);
+    $("#group_name").val(obj.name);
+    $("#group_limit").val(obj.limit);
+
+})
+
+$('#updateChatGroupForm').submit(function(e){
+    e.preventDefault();
+    $.ajax({
+        url:'/update-chat-group',
+        type: 'POST',
+        data:new FormData(this),
+        contentType: false,
+        cache:false,
+        processData:false,
+        success: function(response){
+            alert(response.msg);
+            if(response.success){
+                location.reload();
+            }
+        }
+    })
+})
+
+
+// Delete Goup 
+
+$('.deleteGroup').click(function(e){
+    $('#delete_group_id').val($(this).attr('data-id'));
+    $('#delete_group_name').text($(this).attr('data-name'));
+    // console.log($(this).attr('data-name'));
+})
+
+
+$('#deleteChatGroupForm').submit(function(event){
+    event.preventDefault();
+    var formData = $(this).serialize();
+    $.ajax({
+        url:'/delete-chat-group',
+        type: 'POST',
+        data:formData,
+        success: function(response){
+            alert(response.msg);
+            if(response.success){
+                location.reload();
+            }
+        }
+    });
+})
+
+// Copy 
+
+$('.copy').click(function(event){
+    $(this).prepend('<span class="copied_text">Copied</span>');
+    var group_id = $(this).attr('data-id');
+    var url = window.location.host+'/share-group/'+group_id;
+    var temp = $("<input>");
+    $("body").append(temp);
+    temp.val(url).select();
+    document.execCommand("copy");
+    temp.remove();
+    setTimeout(() => {
+        $(".copied_text").remove();
+    }, 2000);
 })

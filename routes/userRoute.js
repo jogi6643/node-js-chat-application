@@ -46,7 +46,9 @@ const {
     groups,
     createGroup,
     getMembers,
-    addMembers
+    addMembers,
+    updateChatGroup,
+    deleteChatGroup
 } = require('../controllers/userController')
 const {isLoggedIn,isLoggedOut} = require('../middleware/auth')
 
@@ -67,6 +69,8 @@ user_route.get('/groups',isLoggedIn, groups);
 user_route.post('/groups',upload.single('image'), createGroup);
 user_route.post('/get-members',isLoggedIn, getMembers);
 user_route.post('/add-members',isLoggedIn, addMembers);
+user_route.post('/update-chat-group',upload.single('image'), updateChatGroup);
+user_route.post('/delete-chat-group',isLoggedIn, deleteChatGroup);
 
 // user_route.get('*',(req,res)=>{
 //     res.redirect('/login')
