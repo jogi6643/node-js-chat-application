@@ -314,6 +314,20 @@ try {
     console.log(error.message);
 }
 }
+
+
+const shareGroup = async(req, res) => {
+    try {
+       var groupData =  await Group.findOne({_id:req.param.id});
+       if(!groupData){
+        res.render('utility/error',{message:'404 not found'});
+       }else if(req.session.user==undefined){
+        res.render('utility/error',{message:'You need to login to access the Share URL..'});
+       }
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 module.exports = {
     registerLoad,
     register,
@@ -329,5 +343,6 @@ module.exports = {
     getMembers,
     addMembers,
     updateChatGroup,
-    deleteChatGroup
+    deleteChatGroup,
+    shareGroup
 }
