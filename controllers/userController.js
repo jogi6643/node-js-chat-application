@@ -318,11 +318,17 @@ try {
 
 const shareGroup = async(req, res) => {
     try {
-       var groupData =  await Group.findOne({_id:req.param.id});
+       var groupData =  await Group.findOne({_id:req.params.id});
        if(!groupData){
         res.render('utility/error',{message:'404 not found'});
        }else if(req.session.user==undefined){
-        res.render('utility/error',{message:'You need to login to access the Share URL..'});
+        res.render('utility/error',{message:'You need to login to access the Share URL!'});
+       }else{
+        var totalMembers = await Member.find({group_id:req.params.id}).count();
+        var availabe = groupData.limit - totalMembers;
+        var isOwner = groupData.creator_id == req.session.user._id?true:false;
+        var isJoined = await Member.find({group_id:req.params.id,user_id:req.session.user._id}).count();
+        res.render('shareLink',{group:groupData,availabe:availabe,totalMembers:totalMembers,isOwner:isOwner,isJoined:isJoined})
        }
     } catch (error) {
         console.log(error.message);
