@@ -343,3 +343,26 @@ $('.copy').click(function(event){
         $(".copied_text").remove();
     }, 2000);
 })
+
+// join now chat 
+
+$('.join-now').click(function(e) {
+    $(this).text('waiting...');
+    $(this).attr('disabled', 'disabled');
+    var group_id = $(this).attr('data-id');
+    $.ajax({
+        url:'/join-group',
+        type: 'POST',
+        data:{group_id:group_id},
+        success: function(res){
+            alert(res.msg);
+            if(res.success){
+                location.reload();
+            }else{
+            $(this).text('Join Now');
+            $(this).removeAttr('disabled');
+            }
+
+        }
+    })
+})
